@@ -2,23 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//this class basically renders an empty button
-//To check for a winner, we’ll maintain the value of each of the 9 squares in one location.
+//this function basically renders an empty button
+//To check for a winner, we’ll maintain the value of each of the 9 squares in one location: Board class
 //'the best approach is to store the game’s state in the parent Board component instead of in each Square'
 //this is a controlled component
-class Square extends React.Component {
-  render() {
-    return (
-      <button 
-        className="square" 
-        onClick={() => this.props.onClik()}
-        //'By calling this.setState from an onClick handler in the Square’s render method, 
-        //we tell React to re-render that Square whenever its <button> is clicked.'
-      > 
-        {this.props.value}
-      </button>
-    );
-  }
+function Square(props) {
+  return (
+    <button className="square" onClick={props.onClik}>
+      {props.value}
+    </button>
+  );
 }
 
 
@@ -30,14 +23,18 @@ class Board extends React.Component {
       //'Array.fill works great for immutable values like numbers, strings, and booleans.' (Source: Sophia Shoemaker)
       //It sets up an array with 9 slots and populates it with null values 
       squaresArray: Array(9).fill(null),
+      xIsNext: true,
     }
   }
 
   handleClick(i) {
-    const squares = this.state.squaresArray.slice();
+    const squaresArrayCopy = this.state.squaresArray.slice();
     //'the slice() method returns a shallow copy of a portion of an array into a new array object' without modifying the original array. (MDN)
-    squares[i] = 'X';
-    this.setState({squaresArray: squares});
+    squaresArrayCopy[i] = this.state.xIsNext ? 'X' : 'O';  
+    this.setState({
+      squaresArray: squaresArrayCopy,
+      xIsNext: !this.state.xIsNext,  //false
+    });
   }
   
   renderSquare(i) {
@@ -52,7 +49,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
     return (
       <div>
